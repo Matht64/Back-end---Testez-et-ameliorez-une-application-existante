@@ -21,4 +21,16 @@ public class GlobalExceptionHandler {
                     "message", ex.getMessage()
                 ));
     }
+
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<Map<String, String>> handleUserAlreadyExist(
+            UserAlreadyExistException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                    "error", "USER_ALREADY_EXIST",
+                    "message", ex.getMessage()
+                ));
+    }
 }

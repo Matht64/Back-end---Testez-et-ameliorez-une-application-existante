@@ -1,6 +1,5 @@
 package com.openclassrooms.etudiant.service;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.openclassrooms.etudiant.entities.User;
+import com.openclassrooms.etudiant.exception.UserAlreadyExistException;
 import com.openclassrooms.etudiant.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -30,7 +30,7 @@ public class UserService {
 
         Optional<User> optionalUser = userRepository.findByLogin(user.getLogin());
         if (optionalUser.isPresent()) {
-            throw new IllegalArgumentException("User with login " + user.getLogin() + " already exists");
+            throw new UserAlreadyExistException(user.getLogin());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -41,8 +41,7 @@ public class UserService {
         Assert.notNull(password, "Password must not be null");
         Optional<User> user = userRepository.findByLogin(login);
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            UserDetails userDetails =
-            org.springframework.security.core.userdetails.User
+            UserDetails userDetails = org.springframework.security.core.userdetails.User
                     .withUsername(user.get().getLogin())
                     .password(user.get().getPassword())
                     .authorities("ROLE_USER")
